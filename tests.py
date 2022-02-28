@@ -55,3 +55,43 @@ class SchemaParserTests(TestCase):
     def test_generate_paths(self):
         paths = Extractor._generate_paths(self.schema)
         self.assertEqual(len(list(paths)), 5)
+
+
+class ExtractDataTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        schema = {
+            "x": {
+                "a": "{x}",
+                "b": "...",
+                "c": "{a thing}"
+            },
+            "y": "{z}",
+            "...": "..."
+        }
+        cls.extractor = Extractor(schema)
+        cls.test_data = {
+            "something": "a",
+            "x": {
+                "a": "the x variable",
+                "c": "a thing variable",
+                "b": "anything",
+                "d": "nothing"
+            },
+            "y": "the z variable",
+            "z": {
+                "a": "sdfasdf"
+            }
+        }
+
+    def test_extract_test_data(self):
+        extracted_data = self.extractor.extract(self.test_data)
+        self.assertEqual(
+            {
+                "x": "the x variable",
+                "a thing": "a thing variable",
+                "z": "the z variable"
+            },
+            extracted_data
+        )

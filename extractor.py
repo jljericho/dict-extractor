@@ -9,7 +9,19 @@ class Extractor:
         self._validate_parsed_schema()
 
     def extract(self, data: dict):
-        pass
+        extracted_data = dict()
+        for variable, path in self.schema.items():
+            value = self._extract_a_path(data, path)
+            extracted_data[variable] = value
+        return extracted_data
+
+    @classmethod
+    def _extract_a_path(cls, data, keys):
+        data = data.copy()
+        for k in keys:
+            data = data[k]
+        return data
+
 
     def _validate_raw_schema(self, schema):
         self._require_dict(schema)
@@ -25,7 +37,6 @@ class Extractor:
             if value[0] == "{":
                 value = self._remove_tags(value)
                 parsed_schema[value] = path
-        print(parsed_schema)
         self.schema = parsed_schema
         return parsed_schema
 
