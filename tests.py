@@ -24,3 +24,33 @@ class BasicExtractorTests(TestCase):
     def test_schema_must_be_a_dict(self):
         with self.assertRaises(TypeError):
             Extractor("a string")
+
+
+class SchemaParserTests(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = {
+            "x": {
+                "a": "{x}",
+                "b": "...",
+                "c": "{a thing}"
+            },
+            "y": "{z}",
+            "...": "..."
+        }
+
+    def test_parses_to_list_of_keys(self):
+        parsed = Extractor(self.schema)._parse_schema()
+        self.assertEqual(
+            parsed,
+            {
+                "{x}": ["x", "a"],
+                "{a thing}": ["x", "c"],
+                "{z}": ["y"]
+            }
+        )
+
+    def test_generate_paths(self):
+        paths = Extractor._generate_paths(self.schema)
+        self.assertEqual(len(list(paths)), 5)
