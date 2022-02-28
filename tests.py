@@ -41,14 +41,15 @@ class SchemaParserTests(TestCase):
         }
 
     def test_parses_to_list_of_keys(self):
-        parsed = Extractor(self.schema)._parse_schema()
+        extractor = Extractor(self.schema)
+        parsed = extractor.schema
         self.assertEqual(
-            parsed,
             {
-                "{x}": ["x", "a"],
-                "{a thing}": ["x", "c"],
-                "{z}": ["y"]
-            }
+                "x": ["x", "a"],
+                "a thing": ["x", "c"],
+                "z": ["y"]
+            },
+            parsed
         )
 
     def test_generate_paths(self):
