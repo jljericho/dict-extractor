@@ -22,7 +22,6 @@ class Extractor:
             data = data[k]
         return data
 
-
     def _validate_raw_schema(self, schema):
         self._require_dict(schema)
 
