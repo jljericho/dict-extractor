@@ -1,3 +1,4 @@
+from functools import reduce
 
 
 class Extractor:
@@ -17,22 +18,11 @@ class Extractor:
 
     @classmethod
     def _extract_a_path(cls, data, keys):
-        data = data.copy()
-        for k in keys:
-            data = data[k]
-        return data
-
-    def _validate_raw_schema(self, schema):
-        self._require_dict(schema)
-
-    @staticmethod
-    def _require_dict(data):
-        if not isinstance(data, dict):
-            raise TypeError(f"Data should be a dictionary, not {type(data)}.")
+        return reduce(lambda d, k: d.get(k), keys, data)
 
     def _parse_schema(self):
-        parsed_schema = {}
-        for path, value in self._generate_paths(self.schema):
+        parsed_schema = dict()
+        for value, path in self._generate_paths(self.schema):
             if value[0] == "{":
                 value = self._remove_tags(value)
                 parsed_schema[value] = path
@@ -40,11 +30,8 @@ class Extractor:
         return parsed_schema
 
     @classmethod
-    def _remove_tags(cls, value: str):
-        return value.replace("{", "").replace("}", "")
-
-    @classmethod
     def _generate_paths(cls, schema, path=None):
+        """Create generator objects of the unique paths to each value in the original schema"""
         if path is None:
             path = []
         for k, v in schema.items():
@@ -53,7 +40,25 @@ class Extractor:
                 for u in cls._generate_paths(v, new_path):
                     yield u
             else:
-                yield new_path, v
+                yield v, new_path
+
+    @staticmethod
+    def _remove_tags(value: str):
+        return value.replace("{", "").replace("}", "")
+
+    def _validate_raw_schema(self, schema):
+        self._require_dict(schema)
+        if len(schema) == 0:
+            raise ValueError("Dictionary must not be empty.")
+        return self
+
+    @staticmethod
+    def _require_dict(data):
+        if not isinstance(data, dict):
+            raise TypeError(f"Data should be a dictionary, not {type(data)}.")
 
     def _validate_parsed_schema(self):
         self._require_dict(self.schema)
+        if len(self.schema) == 0:
+            raise ValueError("Schema dictionary must include braced variables.")
+        return self

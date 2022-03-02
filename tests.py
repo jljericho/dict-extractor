@@ -25,6 +25,14 @@ class BasicExtractorTests(TestCase):
         with self.assertRaises(TypeError):
             Extractor("a string")
 
+    def test_empty_schema_throws_exception(self):
+        with self.assertRaises(ValueError):
+            Extractor({})
+
+    def test_schema_without_braises_raises_exception(self):
+        with self.assertRaises(ValueError):
+            Extractor({"a": "b"})
+
 
 class SchemaParserTests(TestCase):
 
