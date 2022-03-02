@@ -3,7 +3,7 @@ from unittest import TestCase
 from extractor import Extractor
 
 
-class BasicExtractorTests(TestCase):
+class ExtractorInstantiationTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -33,6 +33,12 @@ class BasicExtractorTests(TestCase):
         with self.assertRaises(ValueError):
             Extractor({"a": "b"})
 
+    def test_does_not_all_duplicate_keys(self):
+        bad_schema = self.schema.copy()
+        bad_schema["zz"] = "{z}"
+        with self.assertRaises(ValueError):
+            Extractor(bad_schema)
+
 
 class SchemaParserTests(TestCase):
 
@@ -56,6 +62,22 @@ class SchemaParserTests(TestCase):
                 "x": ["x", "a"],
                 "a thing": ["x", "c"],
                 "z": ["y"]
+            },
+            parsed
+        )
+
+    def test_parses_keys_with_precedence(self):
+        schema = self.schema.copy()
+        schema["y"] = "{z, 0}"
+        schema["zz"] = "{z, 1}"
+        extractor = Extractor(schema)
+        parsed = extractor.schema
+        print(parsed)
+        self.assertEqual(
+            {
+                "x": [["x", "a"]],
+                "a thing": [["x", "c"]],
+                "z": [["y"], ["zz"]]
             },
             parsed
         )
@@ -100,6 +122,20 @@ class ExtractDataTests(TestCase):
                 "x": "the x variable",
                 "a thing": "a thing variable",
                 "z": "the z variable"
+            },
+            extracted_data
+        )
+
+    def test_extract_defaults_to_none(self):
+        missing_data = self.test_data.copy()
+        del missing_data["y"]
+        extracted_data = self.extractor.extract(missing_data)
+        print(extracted_data)
+        self.assertEqual(
+            {
+                "x": "the x variable",
+                "a thing": "a thing variable",
+                "z": None
             },
             extracted_data
         )

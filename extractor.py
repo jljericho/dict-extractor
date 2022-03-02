@@ -25,9 +25,15 @@ class Extractor:
         for value, path in self._generate_paths(self.schema):
             if value[0] == "{":
                 value = self._remove_tags(value)
+                self._check_for_existing_key(value, parsed_schema)
                 parsed_schema[value] = path
         self.schema = parsed_schema
         return parsed_schema
+
+    @classmethod
+    def _check_for_existing_key(cls, key, schema):
+        if key in schema.keys():
+            raise ValueError(f"Cannot have a duplicated target without precedence ({key})")
 
     @classmethod
     def _generate_paths(cls, schema, path=None):
