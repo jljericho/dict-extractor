@@ -56,7 +56,7 @@ class SchemaParserTests(TestCase):
 
     def test_parses_to_list_of_keys(self):
         extractor = Extractor(self.schema)
-        parsed = extractor.schema
+        parsed = extractor.tags
         self.assertEqual(
             {
                 "x": ["x", "a"],
@@ -66,24 +66,8 @@ class SchemaParserTests(TestCase):
             parsed
         )
 
-    def test_parses_keys_with_precedence(self):
-        schema = self.schema.copy()
-        schema["y"] = "{z, 0}"
-        schema["zz"] = "{z, 1}"
-        extractor = Extractor(schema)
-        parsed = extractor.schema
-        print(parsed)
-        self.assertEqual(
-            {
-                "x": [["x", "a"]],
-                "a thing": [["x", "c"]],
-                "z": [["y"], ["zz"]]
-            },
-            parsed
-        )
-
     def test_generate_paths(self):
-        paths = Extractor._generate_paths(self.schema)
+        paths = Extractor._generate_paths_to_all_values(self.schema)
         self.assertEqual(len(list(paths)), 5)
 
 
@@ -130,7 +114,6 @@ class ExtractDataTests(TestCase):
         missing_data = self.test_data.copy()
         del missing_data["y"]
         extracted_data = self.extractor.extract(missing_data)
-        print(extracted_data)
         self.assertEqual(
             {
                 "x": "the x variable",
@@ -139,3 +122,4 @@ class ExtractDataTests(TestCase):
             },
             extracted_data
         )
+
