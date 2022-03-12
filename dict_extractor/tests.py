@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from extractor import Extractor
+from .extractor import Extractor
 
 
 class ExtractorInstantiationTests(TestCase):
@@ -9,11 +9,11 @@ class ExtractorInstantiationTests(TestCase):
     def setUpClass(cls):
         cls.schema = {
             "x": {
-                "a": "{x}",
+                "a": "{{x}}",
                 "b": "...",
-                "c": "{a thing}"
+                "c": "{{a thing}}"
             },
-            "y": "{z}",
+            "y": "{{z}}",
             "...": "..."
         }
 
@@ -35,7 +35,7 @@ class ExtractorInstantiationTests(TestCase):
 
     def test_does_not_all_duplicate_keys(self):
         bad_schema = self.schema.copy()
-        bad_schema["zz"] = "{z}"
+        bad_schema["zz"] = "{{z}}"
         with self.assertRaises(ValueError):
             Extractor(bad_schema)
 
@@ -46,11 +46,11 @@ class SchemaParserTests(TestCase):
     def setUpClass(cls):
         cls.schema = {
             "x": {
-                "a": "{x}",
+                "a": "{{x}}",
                 "b": "...",
-                "c": "{a thing}"
+                "c": "{{a thing}}"
             },
-            "y": "{z}",
+            "y": "{{z}}",
             "...": "..."
         }
 
@@ -77,11 +77,11 @@ class ExtractDataTests(TestCase):
     def setUpClass(cls):
         schema = {
             "x": {
-                "a": "{x}",
+                "a": "{{x}}",
                 "b": "...",
-                "c": "{a thing}"
+                "c": "{{a thing}}"
             },
-            "y": "{z}",
+            "y": "{{z}}",
             "...": "..."
         }
         cls.extractor = Extractor(schema)
@@ -122,4 +122,3 @@ class ExtractDataTests(TestCase):
             },
             extracted_data
         )
-

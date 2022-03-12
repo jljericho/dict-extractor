@@ -36,12 +36,12 @@ Another option is to specify the schema we expect, condensing the logic into a s
 
 ```python
 schema = {
-    "title": "{title}",
-    "authors": "{authors}",
+    "title": "{{title}}",
+    "authors": "{{authors}}",
     "...": "...",
     "identifiers": {
-        "isbn": "{isbn13}",
-        "isbn10": "{isbn10}"
+        "isbn": "{{isbn13}}",
+        "isbn10": "{{isbn10}}"
     }
 }
 ```

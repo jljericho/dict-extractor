@@ -3,6 +3,9 @@ from functools import reduce
 
 class Extractor:
 
+    left_tag = "{{"
+    right_tag = "}}"
+
     def __init__(self, schema: dict):
         self._validate_raw_schema(schema)
         self.tags = self._identify_tags(schema)
@@ -43,18 +46,18 @@ class Extractor:
             else:
                 yield v, new_path
 
-    @staticmethod
-    def _is_value_a_tag(value: str):
-        return value[0] == "{" and value[-1] == "}"
+    @classmethod
+    def _is_value_a_tag(cls, value: str):
+        return value[:len(cls.left_tag)] == cls.left_tag and value[len(value) - len(cls.right_tag):] == cls.right_tag
 
     @classmethod
     def _check_for_existing_key(cls, key, schema):
         if key in schema.keys():
             raise ValueError(f"Cannot have a duplicated target.")
 
-    @staticmethod
-    def _remove_tags(value: str):
-        return value.replace("{", "").replace("}", "")
+    @classmethod
+    def _remove_tags(cls, value: str):
+        return value.replace(cls.left_tag, "").replace(cls.right_tag, "")
 
     @classmethod
     def _validate_raw_schema(cls, schema):
